@@ -1,5 +1,5 @@
 const { BotFrameworkAdapter, MemoryStorage, ConversationState, UserState } = require('botbuilder');
-const restify = require('restify');
+const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 
@@ -7,9 +7,9 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Create server
-const server = restify.createServer();
-server.listen(process.env.PORT || 3978, () => {
-    console.log(`${server.name} listening to ${server.url}`);
+const app = express();
+app.listen(process.env.PORT || 3978, () => {
+    console.log(`Server is listening on port ${process.env.PORT || 3978}`);
 });
 
 // Create adapter
@@ -27,7 +27,7 @@ const userState = new UserState(memoryStorage);
 const bot = require('./bot');
 
 // Listen for incoming requests
-server.post('/api/messages', (req, res) => {
+app.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         await bot.run(context);
     });
