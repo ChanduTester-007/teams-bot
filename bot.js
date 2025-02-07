@@ -7,12 +7,7 @@ class MyBot extends ActivityHandler {
         this.userState = userState;
 
         this.onMessage(async (context, next) => {
-            const txt = context.activity.text.trim().toLowerCase();
-            if (txt === 'hello') {
-                await context.sendActivity('Hello! How can I assist you today?');
-            } else {
-                await context.sendActivity(`You said: ${txt}`);
-            }
+            await context.sendActivity(`You said: ${context.activity.text}`);
             await next();
         });
     }
