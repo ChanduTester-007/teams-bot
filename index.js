@@ -1,32 +1,32 @@
-require('dotenv').config();
 const restify = require('restify');
-const { BotFrameworkAdapter, MemoryStorage, ConversationState, UserState } = require('botbuilder');
-const { TeamsBot } = require('./bot');
+const { BotFrameworkAdapter } = require('botbuilder');
+const { BotConfiguration } = require('./config');
+const { MyBot } = require('./bot');
 
-// Create HTTP server for Render
+// Create server
 const server = restify.createServer();
-const PORT = process.env.PORT || 10000;  // Render provides a port dynamically
-server.listen(PORT, () => {
-    console.log(`\nBot is running on port ${PORT}`);
+server.listen(process.env.port || process.env.PORT || 3978, () => {
+    console.log(`\n${server.name} listening to ${server.url}`);
 });
 
-// Create adapter for Microsoft Bot Framework
+// Create adapter
 const adapter = new BotFrameworkAdapter({
-    appId: process.env.MICROSOFT_APP_ID,
-    appPassword: process.env.MICROSOFT_APP_PASSWORD
+    appId: BotConfiguration.AppId,
+    appPassword: BotConfiguration.AppPassword
 });
 
-// Create state storage
-const memoryStorage = new MemoryStorage();
-const conversationState = new ConversationState(memoryStorage);
-const userState = new UserState(memoryStorage);
+// Catch-all for errors
+adapter.onTurnError = async (context, error) => {
+    console.error(`\n [onTurnError]: ${error}`);
+    await context.sendActivity('Oops. Something went wrong!');
+};
 
-// Create bot instance
-const bot = new TeamsBot(conversationState, userState);
+// Create bot
+const myBot = new MyBot();
 
-// Endpoint for Teams messages
-server.post('/api/messages', async (req, res) => {
-    await adapter.processActivity(req, res, async (context) => {
-        await bot.run(context);
+// Listen for incoming requests
+server.post('/api/messages', (req, res) => {
+    adapter.processActivity(req, res, async (context) => {
+        await myBot.run(context);
     });
 });
