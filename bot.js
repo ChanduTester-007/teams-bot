@@ -1,6 +1,6 @@
 const { ActivityHandler } = require('botbuilder');
 
-class MyBot extends ActivityHandler {
+class TeamsBot extends ActivityHandler {
     constructor(conversationState, userState) {
         super();
         this.conversationState = conversationState;
@@ -8,6 +8,16 @@ class MyBot extends ActivityHandler {
 
         this.onMessage(async (context, next) => {
             await context.sendActivity(`You said: ${context.activity.text}`);
+            await next();
+        });
+
+        this.onMembersAdded(async (context, next) => {
+            const membersAdded = context.activity.membersAdded;
+            for (let member of membersAdded) {
+                if (member.id !== context.activity.recipient.id) {
+                    await context.sendActivity('Hello! I am your Teams bot. How can I assist you?');
+                }
+            }
             await next();
         });
     }
@@ -19,4 +29,4 @@ class MyBot extends ActivityHandler {
     }
 }
 
-module.exports.MyBot = MyBot;
+module.exports.TeamsBot = TeamsBot;
