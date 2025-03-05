@@ -10,8 +10,8 @@ app.use(express.json());
 
 // Teams Bot Adapter
 const adapter = new BotFrameworkAdapter({
-    appId: process.env.MICROSOFT_APP_ID,
-    appPassword: process.env.MICROSOFT_APP_PASSWORD
+    appId: '',
+    appPassword: ''
 });
 
 // Simple in-memory storage
