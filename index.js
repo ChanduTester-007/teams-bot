@@ -1,3 +1,4 @@
+const { CloudAdapter } = require('botbuilder');
 require("dotenv").config();
 const express = require("express");
 const { BotFrameworkAdapter, MemoryStorage, ConversationState } = require("botbuilder");
@@ -9,9 +10,9 @@ const PORT = process.env.PORT || 3978;
 app.use(express.json());
 
 // Teams Bot Adapter
-const adapter = new BotFrameworkAdapter({
-    appId: '',
-    appPassword: ''
+const adapter = new CloudAdapter({
+    appId: process.env.MICROSOFT_APP_ID || "",
+    appPassword: process.env.MICROSOFT_APP_PASSWORD || ""
 });
 
 // Simple in-memory storage
