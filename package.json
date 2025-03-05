@@ -1,14 +1,26 @@
 {
-    "name": "teams-bot",
-    "version": "1.0.0",
-    "description": "Microsoft Teams chatbot using Node.js",
-    "main": "index.js",
-    "scripts": {
-        "start": "node index.js"
-    },
-    "dependencies": {
-        "botbuilder": "^4.23.2",
-        "dotenv": "^16.4.7",
-        "express": "^4.21.2"
-    }
+  "name": "tbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChanduTester-007/teams-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChanduTester-007/teams-bot/issues"
+  },
+  "homepage": "https://github.com/ChanduTester-007/teams-bot#readme",
+  "description": "",
+  "dependencies": {
+    "botbuilder": "^4.23.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "formidable": "^3.5.2"
+  }
 }

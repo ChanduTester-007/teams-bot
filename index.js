@@ -1,24 +1,33 @@
 require("dotenv").config();
-const restify = require("restify");
-const { BotFrameworkAdapter } = require("botbuilder");
-const SupportBot = require("./bot");
+const express = require("express");
+const { BotFrameworkAdapter, MemoryStorage, ConversationState } = require("botbuilder");
 
+const app = express();
+const PORT = process.env.PORT || 3978;
+
+// Middleware to parse JSON requests
+app.use(express.json());
+
+// Teams Bot Adapter
 const adapter = new BotFrameworkAdapter({
-  appId: process.env.MICROSOFT_APP_ID,
-  appPassword: process.env.MICROSOFT_APP_PASSWORD,
+    appId: process.env.MICROSOFT_APP_ID,
+    appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
-const bot = new SupportBot();
+// Simple in-memory storage
+const memoryStorage = new MemoryStorage();
+const conversationState = new ConversationState(memoryStorage);
 
-const server = restify.createServer();
-server.use(restify.plugins.bodyParser());
-
-server.post("/api/messages", async (req, res) => {
-  await adapter.processActivity(req, res, async (context) => {
-    await bot.run(context);
-  });
+// Handle messages
+app.post("/api/messages", (req, res) => {
+    adapter.processActivity(req, res, async (context) => {
+        if (context.activity.type === "message") {
+            await context.sendActivity(`You said: ${context.activity.text}`);
+        }
+    });
 });
 
-server.listen(process.env.PORT || 3978, () => {
-  console.log(`🚀 Bot is running on http://localhost:${process.env.PORT || 3978}`);
+// Deploy on Render
+app.listen(PORT, () => {
+    console.log(`✅ Bot is running on port ${PORT}`);
 });
