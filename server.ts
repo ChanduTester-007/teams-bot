@@ -1,7 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const adapter = require("./teamsAdapter");
-const TeamsBot = require("./bot");
+import { TeamsBot } from "./bot";
+
+const bot = new TeamsBot();  // ✅ Declare `bot` only once
 
 const app = express();
 const port = process.env.PORT || 10000;  // Render assigns a dynamic port
@@ -10,9 +12,6 @@ const port = process.env.PORT || 10000;  // Render assigns a dynamic port
 app.get("/", (req, res) => {
     res.send("Microsoft Teams Bot is Running!");
 });
-
-// Initialize the bot
-const bot = new TeamsBot();
 
 // Handle incoming Teams messages
 app.post("/api/messages", async (req, res) => {
