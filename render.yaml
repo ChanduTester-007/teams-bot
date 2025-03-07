@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: teams-bot
+    runtime: node  # Specifies the runtime
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: BOT_ID
+        sync: false
+      - key: BOT_PASSWORD
+        sync: false
