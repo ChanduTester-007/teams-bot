@@ -28,30 +28,21 @@
 // });
 
 
-require('dotenv').config();
-const express = require('express');
 const { BotFrameworkAdapter } = require('botbuilder');
-const { TeamsBot } = require('./bot');
-const { TeamsAdapter } = require('./teamsAdapter');
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-const adapter = new TeamsAdapter();
-const bot = new TeamsBot();
-
-// Middleware for processing bot messages
-app.post('/api/messages', async (req, res) => {
-    await adapter.processActivity(req, res, async (context) => {
-        await bot.run(context);
-    });
+const adapter = new BotFrameworkAdapter({
+    appId: process.env.MICROSOFT_APP_ID, 
+    appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
-// Health check route
-app.get('/', (req, res) => {
-    res.send('Teams Ticket Bot is running on Render!');
-});
+adapter.onTurnError = async (context, error) => {
+    console.error(`[onTurnError] unhandled error: ${error}`);
+    await context.sendActivity(`Oops. Something went wrong!`);
+};
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+adapter.use(async (context, next) => {
+    if (!context.activity.serviceUrl.startsWith('https')) {
+        context.activity.serviceUrl = 'https://teams-bot-v2ak.onrender.com';
+    }
+    await next();
 });
