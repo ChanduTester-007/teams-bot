@@ -28,21 +28,37 @@
 // });
 
 
-const { BotFrameworkAdapter } = require('botbuilder');
+require('dotenv').config();
+const express = require("express");
+const { BotFrameworkAdapter, TurnContext } = require("botbuilder");
 
+const app = express();
+const PORT = process.env.PORT || 3000; // Render assigns a port dynamically
+
+// Create an adapter to handle requests from Teams
 const adapter = new BotFrameworkAdapter({
-    appId: process.env.MICROSOFT_APP_ID, 
+    appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
-adapter.onTurnError = async (context, error) => {
-    console.error(`[onTurnError] unhandled error: ${error}`);
-    await context.sendActivity(`Oops. Something went wrong!`);
-};
+// Middleware to handle JSON requests
+app.use(express.json());
 
-adapter.use(async (context, next) => {
-    if (!context.activity.serviceUrl.startsWith('https')) {
-        context.activity.serviceUrl = 'https://teams-bot-v2ak.onrender.com';
-    }
-    await next();
+// Handle incoming messages from Teams
+app.post("/api/messages", (req, res) => {
+    adapter.processActivity(req, res, async (context) => {
+        if (context.activity.type === "message") {
+            await context.sendActivity(`Hello! This bot is deployed on Render.`);
+        }
+    });
+});
+
+// Root endpoint to check if the bot is running
+app.get("/", (req, res) => {
+    res.send("Teams bot is running on Render!");
+});
+
+// Start the Express server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
