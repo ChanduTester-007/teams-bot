@@ -28,19 +28,18 @@ const adapter = new BotFrameworkAdapter({
 
 // Global error handling
 adapter.onTurnError = async (context, error) => {
-    console.error("⚠️ Bot error occurred:", error);
-
+    console.error("❌ Bot error:", error);
     try {
-        await context.sendActivity("Oops! Something went wrong. Please try again later.");
+        await context.sendActivity("⚠️ Oops! Something went wrong.");
     } catch (err) {
         console.error("⚠️ Failed to send error message to user:", err);
     }
 };
 
-// Ensure remote service URL is correctly handled
+// ✅ Middleware to fix the service URL
 adapter.use(async (context, next) => {
-    if (context.activity.serviceUrl && context.activity.serviceUrl.includes("localhost")) {
-        console.warn("⚠️ Warning: Overriding service URL to use remote bot hosting.");
+    if (context.activity.serviceUrl.includes("localhost")) {
+        console.warn("⚠️ Overriding service URL to use remote Render URL.");
         context.activity.serviceUrl = process.env.RENDER_SERVICE_URL || context.activity.serviceUrl;
     }
     await next();
