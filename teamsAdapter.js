@@ -17,32 +17,20 @@
 
 
 
+const { BotFrameworkAdapter } = require('botbuilder');
 
-const { BotFrameworkAdapter, TurnContext } = require("botbuilder");
-require("dotenv").config();
+class TeamsAdapter extends BotFrameworkAdapter {
+    constructor() {
+        super({
+            appId: process.env.BOT_ID,
+            appPassword: process.env.BOT_PASSWORD
+        });
 
-const adapter = new BotFrameworkAdapter({
-    appId: process.env.MICROSOFT_APP_ID || "",
-    appPassword: process.env.MICROSOFT_APP_PASSWORD || ""
-});
-
-// Global error handling
-adapter.onTurnError = async (context, error) => {
-    console.error("❌ Bot error:", error);
-    try {
-        await context.sendActivity("⚠️ Oops! Something went wrong.");
-    } catch (err) {
-        console.error("⚠️ Failed to send error message to user:", err);
+        this.onTurnError = async (context, error) => {
+            console.error(`Error: ${error}`);
+            await context.sendActivity('An error occurred.');
+        };
     }
-};
+}
 
-// ✅ Middleware to fix the service URL
-adapter.use(async (context, next) => {
-    if (context.activity.serviceUrl.includes("localhost")) {
-        console.warn("⚠️ Overriding service URL to use remote Render URL.");
-        context.activity.serviceUrl = process.env.RENDER_SERVICE_URL || context.activity.serviceUrl;
-    }
-    await next();
-});
-
-module.exports = { adapter };
+module.exports.TeamsAdapter = TeamsAdapter;
