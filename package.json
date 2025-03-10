@@ -22,5 +22,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "formidable": "^3.5.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
   }
 }
