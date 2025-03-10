@@ -28,32 +28,41 @@
 // });
 
 
-const express = require("express");
-const bodyParser = require("body-parser");
-require("dotenv").config();
-const { TeamsBot } = require("./bot");
-const { adapter } = require("./teamsAdapter");
+const express = require('express');
+const { BotFrameworkAdapter } = require('botbuilder');
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Render assigns this dynamically
+app.use(express.json());
 
-app.use(bodyParser.json());
+// Check if running on Render (Disable Local)
+if (!process.env.RENDER) {
+    console.error("⚠️ This bot only runs on Render. Exiting...");
+    process.exit(1);
+}
 
-const bot = new TeamsBot();
+// Bot Adapter
+const adapter = new BotFrameworkAdapter({
+    appId: process.env.MicrosoftAppId,
+    appPassword: process.env.MicrosoftAppPassword
+});
 
-app.post("/api/messages", async (req, res) => {
-    console.log("Incoming request:", req.body);
-
-    if (!req.body) {
-        return res.status(400).send("Bad Request: No body received");
+// Bot Logic: Reply to Messages
+const botLogic = async (context) => {
+    if (context.activity.type === 'message') {
+        await context.sendActivity(`You said: ${context.activity.text}`);
     }
+};
 
-    await adapter.processActivity(req, res, async (context) => {
-        await bot.run(context);
+// Teams Bot Route
+app.post('/api/messages', (req, res) => {
+    adapter.processActivity(req, res, async (context) => {
+        await botLogic(context);
     });
 });
 
-// Render requires 0.0.0.0 for proper hosting
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 Bot is running on port ${PORT}`);
+// Start Server (Only in Render)
+const PORT = process.env.PORT || 3978;
+app.listen(PORT, () => {
+    console.log(`✅ Bot is running on Render at port ${PORT}`);
 });
+
